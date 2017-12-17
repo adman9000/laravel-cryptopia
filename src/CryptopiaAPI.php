@@ -52,12 +52,32 @@ class CryptopiaAPI
         return $t['Data'];
     }
 
+
+    public function getCurrencies($currency=false)
+    {
+        $t = $this->request("GetCurrencies");
+        return $t['Data'];
+    }
+
+
+    public function getAssetPairs($currency=false)
+    {
+        $t = $this->request("GetTradePairs");
+        return $t['Data'];
+    }
+
+
     public function getBalances() {
 
         $b = $this->privateRequest("GetBalance");
         return $b['Data'];
 
     }
+
+
+
+
+
 
     private function request($url, $params = [], $method = "GET") {
         $opt = [
