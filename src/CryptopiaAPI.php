@@ -33,13 +33,12 @@ class CryptopiaAPI
     {
         curl_close($this->curl);
     }
-	
-	function test() {
+    
+    
+    function setAPI($key, $secret) {
 
-       // dd($this->getTicker());
-
-        dd($this->getBalances());
-
+       $this->key = $key;
+       $this->secret = $secret;
     }
 
      /**
@@ -47,9 +46,9 @@ class CryptopiaAPI
      *
      * @return asset pair ticker info
      */
-    public function getTicker()
+    public function getTicker($currency=false)
     {
-        $t = $this->request("GetMarkets");
+        $t = $this->request("GetMarkets".($currency ? "/$currency" : ""));
         return $t['Data'];
     }
 
@@ -100,8 +99,17 @@ class CryptopiaAPI
 
     private function privateRequest($url, $params = [], $method = "GET") {
 
-        $ch = curl_init();
-        $nonce                      = microtime();
+        $url = $this->url . $url;
+
+        //Doesnt work with an empty params array...
+        if(sizeof($params)==0) $params['a'] = 'b';
+
+        static $ch = null;
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; Cryptopia.co.nz API PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
+
+         $nonce = explode(' ', microtime())[1];
         $post_data                  = json_encode( $params );
         $m                          = md5( $post_data, true );
         $requestContentBase64String = base64_encode( $m );
@@ -109,6 +117,8 @@ class CryptopiaAPI
         $hmacsignature              = base64_encode( hash_hmac("sha256", $signature, base64_decode( $this->secret ), true ) );
         $header_value               = "amx " . $this->key . ":" . $hmacsignature . ":" . $nonce;
         $headers                    = array("Content-Type: application/json; charset=utf-8", "Authorization: $header_value");
+
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode( $params ) );
           
@@ -120,7 +130,7 @@ class CryptopiaAPI
 
 
         if($result===false)
-            throw new \Exception('CURL error: ' . curl_error($this->curl));
+            throw new \Exception('CURL error: ' . curl_error($ch));
 
          // decode results
         $result = json_decode($result, true);
