@@ -10,40 +10,58 @@ class CryptopiaAPI
     protected $curl;    // curl handle
 
     /**
-     * Constructor for BinanceAPI
+     * Constructor for CryptopiaAPI
      *
      */
     function __construct()
     {
+        //Initialise with the API key stored in config
         $this->key = config('cryptopia.auth.key');
         $this->secret = config('cryptopia.auth.secret');
         $this->url = config('cryptopia.urls.api');
+
+        //Initialise curl
         $this->curl = curl_init();
         curl_setopt_array($this->curl, array(
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_USERAGENT => 'Cryptopia PHP API Agent',
-           // CURLOPT_POST => true,
-            CURLOPT_RETURNTRANSFER => true)
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FRESH_CONNECT => TRUE
+          )
         );
         
     }
 
+    /**
+     * Destructor function
+     **/
     function __destruct()
     {
         curl_close($this->curl);
     }
     
     
+    /**
+     * setAPI()
+     * @param $key - API key
+     * @param $secret - API secret
+     * We can change the API key to access different accounts
+     **/
     function setAPI($key, $secret) {
 
        $this->key = $key;
        $this->secret = $secret;
     }
 
+
+    /**
+     ---------- PUBLIC FUNCTIONS ----------
+     **/
+
      /**
-     * Get ticker
+     * getTicker()
      *
+     * @param $currency - optional currency to retrieve price data for, leave blank for all
      * @return asset pair ticker info
      */
     public function getTicker($currency=false)
@@ -53,20 +71,35 @@ class CryptopiaAPI
     }
 
 
-    public function getCurrencies($currency=false)
+    /**
+     * getCurrencies()
+     * @return array of currencies available on this exchange
+     **/
+    public function getCurrencies()
     {
         $t = $this->request("GetCurrencies");
         return $t['Data'];
     }
 
-
-    public function getAssetPairs($currency=false)
+     /**
+     * getAssetPairs()
+     * @return array of trading pairs available on this exchange
+     **/
+    public function getAssetPairs()
     {
         $t = $this->request("GetTradePairs");
         return $t['Data'];
     }
 
 
+    /**
+     ---------- PRIVATE ACCOUNT FUNCTIONS ----------
+     **/
+
+     /**
+     * getBalances()
+     * @return array of currency balances for this account
+     **/
     public function getBalances() {
 
         $b = $this->privateRequest("GetBalance");
@@ -77,9 +110,19 @@ class CryptopiaAPI
 
 
 
+      /**
+     ---------- REQUESTS ----------
+     **/
 
-
+    /** request()
+    * @param $url - append to the API url to create full request url
+    * @param $params - additional parameters to send
+    * @param $method - GET or POST
+    * @return array from json decoded string
+    * Handles the requests for publically accessible data
+    **/
     private function request($url, $params = [], $method = "GET") {
+
         $opt = [
             "http" => [
                 "method" => $method,
@@ -87,11 +130,8 @@ class CryptopiaAPI
             ]
         ];
 
-        
-
          // build the POST data string
         $postdata = $params;
-
 
         // Set URL & Header
         curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
@@ -111,12 +151,20 @@ class CryptopiaAPI
          // decode results
         $result = json_decode($result, true);
         if(!is_array($result))
-            throw new BinanceAPIException('JSON decode error');
+            throw new \Exception('JSON decode error');
 
         return $result;
 
     }
 
+
+     /** privateRequest()
+    * @param $url - append to the API url to create full request url
+    * @param $params - additional parameters to send
+    * @param $method - GET or POST
+    * @return array from json decoded string
+    * Handles the private requests for account data
+    **/
     private function privateRequest($url, $params = [], $method = "GET") {
 
         $url = $this->url . $url;
@@ -124,12 +172,8 @@ class CryptopiaAPI
         //Doesnt work with an empty params array...
         if(sizeof($params)==0) $params['a'] = 'b';
 
-        static $ch = null;
-         $ch = curl_init();
-         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; Cryptopia.co.nz API PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
-
-         $nonce = explode(' ', microtime())[1];
+        //Authorisation & request code taken from PHP example on cryptopia API guide
+        $nonce = explode(' ', microtime())[1];
         $post_data                  = json_encode( $params );
         $m                          = md5( $post_data, true );
         $requestContentBase64String = base64_encode( $m );
@@ -138,19 +182,14 @@ class CryptopiaAPI
         $header_value               = "amx " . $this->key . ":" . $hmacsignature . ":" . $nonce;
         $headers                    = array("Content-Type: application/json; charset=utf-8", "Authorization: $header_value");
 
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode( $params ) );
-          
-          curl_setopt($ch, CURLOPT_URL, $url );
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-          curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-          $result = curl_exec($ch);
+        curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode( $params ) );
+        curl_setopt($this->curl, CURLOPT_URL, $url );
+        $result = curl_exec($this->curl);
 
 
         if($result===false)
-            throw new \Exception('CURL error: ' . curl_error($ch));
+            throw new \Exception('CURL error: ' . curl_error($this->curl));
 
          // decode results
         $result = json_decode($result, true);
