@@ -108,6 +108,69 @@ class CryptopiaAPI
     }
 
 
+    /** trade()
+     * @param $market - asset pair to trade
+     * @param $amount - amount of trade asset
+     * @param $type - BUY or SELL
+     * @param $rate - limit price
+     * @return
+    **/
+    public function trade($market, $amount, $type, $rate=false) {
+
+
+
+        $data = [
+            'Market' => $market,
+            'Type' => $type,
+            'Amount' => $amount,
+            'Rate' => $rate
+        ];
+
+        $b = $this->privateRequest("SubmitTrade", $data, "POST");
+    
+        return $b;
+
+    }
+
+    /** marketSell()
+     * @param $symbol - asset pair to trade
+     * @param $amount - amount of trade asset
+    */
+    public function marketSell($symbol, $amount) {
+
+        return false;
+
+    }
+    /** marketBuy()
+     * @param $symbol - asset pair to trade
+     * @param $amount - amount of trade asset
+    */
+    public function marketBuy($symbol, $amount) {
+
+        return false;
+        
+    }
+
+    /** limitSell()
+     * @param $symbol - asset pair to trade
+     * @param $amount - amount of trade asset
+    */
+    public function limitSell($market, $amount, $rate) {
+
+        return $this->trade($market, $amount, "SELL", $rate);
+
+    }
+
+    /** marketSell()
+     * @param $symbol - asset pair to trade
+     * @param $amount - amount of trade asset
+    */
+    public function limitBuy($market, $amount, $rate) {
+
+        return $this->trade($market, $amount, "BUY", $rate);
+        
+    }
+
 
 
       /**
