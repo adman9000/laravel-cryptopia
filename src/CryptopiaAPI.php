@@ -69,10 +69,9 @@ class CryptopiaAPI
             'GetBalance', 'GetDepositAddress', 'GetOpenOrders', 'GetTradeHistory', 'GetTransactions',
             'SubmitTrade', 'CancelTrade', 'SubmitTip', 'SubmitWithdraw', 'SubmitTransfer'];
         if (in_array($name, $public_api_names, true)) {
-            $suffix_url = implode('/', $arguments[0]);
-            $t = $this->request($name.($suffix_url ? "/$suffix_url" : ""));
+            $t = $this->request($name.(isset($arguments[0]) ? "/" . implode('/', $arguments[0]) : ""));
         } else if (in_array($name, $private_api_names, true)) {
-            $t = $this->privateRequest($name, $arguments[0], 'POST');
+            $t = $this->privateRequest($name, (isset($arguments[0]) ? $arguments[0] : ""), 'POST');
         } else {
             throw new \Exception('not exists method');
         }
