@@ -53,6 +53,35 @@ class CryptopiaAPI
        $this->secret = $secret;
     }
 
+    
+    /**
+     * Direct call apis
+     * @parma $name - api name
+     * @param $arguments - params
+     * @return result of api
+     */
+    public function __call($name, $arguments) {
+        $name = ucfirst($name);
+        $public_api_names = [
+            'GetCurrencies', 'GetTradePairs', 'GetMarkets', 'GetMarket',
+            'GetMarketHistory', 'GetMarketOrders', 'GetMarketOrderGroups'];
+        $private_api_names = [
+            'GetBalance', 'GetDepositAddress', 'GetOpenOrders', 'GetTradeHistory', 'GetTransactions',
+            'SubmitTrade', 'CancelTrade', 'SubmitTip', 'SubmitWithdraw', 'SubmitTransfer'];
+        if (in_array($name, $public_api_names, true)) {
+            $t = $this->request($name.(isset($arguments[0]) ? "/" . implode('/', $arguments[0]) : []));
+        } else if (in_array($name, $private_api_names, true)) {
+            $t = $this->privateRequest($name, (isset($arguments[0]) ? $arguments[0] : []), 'POST');
+        } else {
+            throw new \Exception('not exists method');
+        }
+        if ($t['Success']) {
+            return $t['Data'];
+        } else {
+            throw new \Exception('API Error:'.$t['Error']);
+
+        }
+    }
 
     /**
      ---------- PUBLIC FUNCTIONS ----------
