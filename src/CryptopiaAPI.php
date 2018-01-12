@@ -202,8 +202,10 @@ class CryptopiaAPI
 
         //Add post vars
         if($method == "POST") {
-            curl_setopt($ch,CURLOPT_POST, count($params));
+            curl_setopt($this->ch,CURLOPT_POST, true);
             curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postdata);
+        } else {
+            curl_setopt($this->ch,CURLOPT_POST, false);
         }
 
         //Get result
