@@ -107,6 +107,47 @@ class CryptopiaAPI
 
     }
 
+    /**
+     * getRecentTrades()
+     * Get trades for a specific account and symbol
+     *
+     * @param string $symbol Currency pair
+     * @param int $limit     Limit of trades. Default. 100
+     * @return mixed
+     * @throws \Exception
+     **/
+    public function getRecentTrades($symbol = false, $limit = 100) {
+
+        $data = array();
+        if($symbol) $data['Market'] = $symbol;
+        if($limit) $data['Count'] = $limit;
+
+        $b = $this->privateRequest("GetTradeHistory", $data, "POST");
+        return $b['Data'];
+
+    }
+
+    /**
+     * getOpenOrders()
+     * Get open orders for a specific account and symbol
+     *
+     * @param string $symbol Currency pair
+     * @param int $limit     Limit of orders. Default. 100
+     * @return mixed
+     * @throws \Exception
+     **/
+    public function getOpenOrders($symbol = false, $limit = 100)
+    {
+
+        $data = array();
+        if($symbol) $data['Market'] = $symbol;
+        if($limit) $data['Count'] = $limit;
+
+        $b = $this->queryPrivate('GetOpenOrders', $data, "POST");
+        return $b['Data'];
+
+    }
+
 
     /** trade()
      * @param $market - asset pair to trade
