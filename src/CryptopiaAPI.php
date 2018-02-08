@@ -56,6 +56,14 @@ class CryptopiaAPI
 
     /**
      ---------- PUBLIC FUNCTIONS ----------
+    * getTicker
+    * getCurrencies
+    * getAssetPairs (for backwards compatibility)
+    * getMarkets (calls getAssetPairs)
+    *
+    *
+    *
+    * 
      **/
 
      /**
@@ -91,9 +99,28 @@ class CryptopiaAPI
         return $t['Data'];
     }
 
+    /**
+     * getMarkets()
+     * @return array of trading pairs available on this exchange
+     **/
+    public function getMarkets()
+    {
+        return $this->getAssetPairs();
+    }
+
+
 
     /**
      ---------- PRIVATE ACCOUNT FUNCTIONS ----------
+    * getBalances
+    * getRecentTrades
+    * getOpenOrders
+    * getAllOrders (false)
+    * trade
+    * marketSell
+    * marketBuy
+    * limitSell
+    * limitBuy
      **/
 
      /**
@@ -146,6 +173,18 @@ class CryptopiaAPI
         $b = $this->queryPrivate('GetOpenOrders', $data, "POST");
         return $b['Data'];
 
+    }
+
+    /**
+     * getAllOrders()
+     * Not available in API
+     *
+     * @param string $symbol Currency pair
+     * @param int $limit     Limit of orders. Default. 100
+     * @return false
+     **/
+    public function getAllOrders($symbol = false, $limit = false) {
+        return false;
     }
 
 
