@@ -26,7 +26,9 @@ class CryptopiaAPI
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_USERAGENT => 'Cryptopia PHP API Agent',
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FRESH_CONNECT => TRUE
+            CURLOPT_FRESH_CONNECT => TRUE,
+            CURLOPT_CONNECTTIMEOUT => 20,
+            CURLOPT_TIMEOUT => 300
           )
         );
         
