@@ -80,6 +80,10 @@ class CryptopiaAPI
         return $t['Data'];
     }
 
+    public function getTickers() {
+        return $this->getTicker();
+    }
+
 
     /**
      * getCurrencies()
