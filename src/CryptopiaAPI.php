@@ -127,6 +127,7 @@ class CryptopiaAPI
     * marketBuy
     * limitSell
     * limitBuy
+    * depositAddress
      **/
 
      /**
@@ -257,6 +258,16 @@ class CryptopiaAPI
         
     }
 
+    /**
+     * Deposit Address
+     * @param string $symbol   Asset symbol
+     * @return mixed
+     **/
+    public function depositAddress($symbol) {
+
+        return $this->privateRequest("GetDepositAddress", ['currency' => $symbol]);
+        
+    }
 
 
       /**
