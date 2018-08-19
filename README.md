@@ -1,5 +1,5 @@
 # laravel-cryptopia
-Laravel implementation of Cryptopia trading API
+Laravel implementation of the Bittrex crypto exchange trading API
 
 ## Install
 
