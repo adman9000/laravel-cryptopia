@@ -24,3 +24,7 @@ Utilises autoloading in Laravel 5.5+. For older versions add the following lines
         'Cryptopia' => adman9000\cryptopia\CryptopiaAPIFacade::class,
     ],
 ```
+
+## Features
+
+Price tickers, balances, trades
