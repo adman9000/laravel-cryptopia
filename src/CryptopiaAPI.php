@@ -269,6 +269,31 @@ class CryptopiaAPI
         
     }
 
+     /**
+    * Deposit History
+    **/
+    public function depositHistory($symbol=false, $status=false) {
+        return false;
+    }
+
+    /**
+    * Withdrawal History
+    **/
+    public function withdrawalHistory($symbol=false, $status=false) {
+        return false;
+    }
+
+    /**
+    * Withdraw Funds
+    * @param string $symbol   Asset symbol
+    * @param string $address
+    * @param string $amount
+    * @param string $paymentid optional
+    * @return mixed
+    **/
+    public function withdrawFunds($symbol, $address, $amount, $paymentid) {
+        return $this->privateRequest("SubmitWithdraw", ['Currency' => $symbol, 'Amount' => $amount, 'Address' => $address, 'PaymentId' => $paymentid]);
+    }
 
       /**
      ---------- REQUESTS ----------
