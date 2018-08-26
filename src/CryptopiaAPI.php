@@ -269,19 +269,7 @@ class CryptopiaAPI
         
     }
 
-     /**
-    * Deposit History
-    **/
-    public function depositHistory($symbol=false, $status=false) {
-        return false;
-    }
 
-    /**
-    * Withdrawal History
-    **/
-    public function withdrawalHistory($symbol=false, $status=false) {
-        return false;
-    }
 
     /**
     * Withdraw Funds
